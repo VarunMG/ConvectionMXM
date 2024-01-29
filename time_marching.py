@@ -32,8 +32,6 @@ def writeFields(fileName,time,b_var,u_var,v_var):
     return 1
 
 # Parameters
-#Lx, Lz = 4, 1
-#Lz = 2
 alpha = 1.5585
 Nx, Nz = 60, 100
 Rayleigh = 10000
@@ -83,9 +81,7 @@ grad_b = d3.grad(b) + ez*lift(tau_b1,-1) # First-order reduction
 dz = lambda A: d3.Differentiate(A, coords['z'])
 dx = lambda A: d3.Differentiate(A, coords['x'])
 
-# Problem
-# First-order form: "div(f)" becomes "trace(grad_f)"
-# First-order form: "lap(f)" becomes "div(grad_f)"
+# Problem (equations and BCs)
 problem = d3.IVP([phi, u, v, b, tau_v1, tau_v2, tau_phi1, tau_phi2, tau_b1, tau_b2], namespace=locals())
 problem.add_equation("div(grad_v) + lift(tau_v2,-1) - phi= 0")
 problem.add_equation("dt(phi) - nu*div(grad_phi)-  dx(dx(b)) + lift(tau_phi2,-1) = -dx(u*phi - v*lap(u))  ")
@@ -100,27 +96,19 @@ problem.add_equation("dz(v)(z=1) = 0")
 problem.add_equation("dz(v)(z=-1) = 0")
 
 
-# problem = d3.IVP([phi, v, b, tau_v1, tau_v2, tau_phi1, tau_phi2, tau_b1, tau_b2], namespace=locals())
-# problem.add_equation("dt(phi) - nu*div(grad_phi) -  dx(dx(b)) + lift(tau_phi2,-1) = 0 ")
-# problem.add_equation("dt(b) - kappa*div(grad_b) + lift(tau_b2,-1) = 0")
-# problem.add_equation("div(grad_v) + lift(tau_v2,-1) - phi = 0")
-# problem.add_equation("b(z=1) = -1")
-# problem.add_equation("v(z=1) = 0")
-# problem.add_equation("b(z=-1) = 1")
-# problem.add_equation("v(z=-1) = 0")
-# problem.add_equation("dz(v)(z=1) = 0")
-# problem.add_equation("dz(v)(z=-1) = 0")
-
-
 # Solver
 solver = problem.build_solver(timestepper)
 solver.stop_sim_time = stop_sim_time
 
 # Initial conditions
+##For random initial perturbation of conduction state
 #b.fill_random('g', seed=42, distribution='normal', scale=1e-3) # Random noise
 #b['g'] *= (1-z) * (1+z) # Damp noise at walls
-b['g'] += - z # Add linear background
+#for symmetric perturbation of conduction state
 b['g'] += np.cos(alpha*x)*np.cos(np.pi*z/2)
+
+#adding conduction state
+b['g'] += - z # Add linear background
 
 # Analysis
 snapshots = solver.evaluator.add_file_handler('snapshots', sim_dt=0.25, max_writes=50)
@@ -138,7 +126,6 @@ CFL.add_velocity(u*ex+v*ez)
 
 # Flow properties
 flow = d3.GlobalFlowProperty(solver, cadence=10)
-#flow.add_property(np.sqrt(d3.dot(u,u))/nu, name='Re')
 flow.add_property(1 + b*v/kappa,name='Nu')
 
 
@@ -169,12 +156,11 @@ try:
         #NuVals.append(flow_Nu)
         #writeNu(NuFileName,tVals,NuVals)
         if (solver.iteration-1) % 10 == 0:
-            #max_Re = flow.max('Re')
-            #logger.info('Iteration=%i, Time=%e, dt=%e, max Re=%f' %(solver.iteration, solver.sim_time, timestep, max_Re))
             logger.info('Iteration=%i, Time=%e, dt=%e, Nu=%f' %(solver.iteration, solver.sim_time, timestep, flow_Nu))
-        if (solver.iteration-1) %10 == 0:
-            fileName = fluidDataFileName + str(round(100000*solver.sim_time)/100000) + '.npy'
-            write = writeFields(fileName,solver.sim_time,b,u,v)
+        #writing things to files
+        #if (solver.iteration-1) %10 == 0:
+            #fileName = fluidDataFileName + str(round(100000*solver.sim_time)/100000) + '.npy'
+            #write = writeFields(fileName,solver.sim_time,b,u,v)
 except:
     logger.error('Exception raised, triggering end of main loop.')
     raise

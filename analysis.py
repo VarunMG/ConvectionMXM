@@ -10,6 +10,14 @@ def openFields(file_name):
         dt = np.load(load_file)
     return uFromFile, vFromFile, bFromFile, phiFromFile, dt
 
+def openFields_timemarcher(file_name):
+    with open(file_name,'rb') as load_file:
+        time = np.load(load_file)
+        bFromFile = np.load(load_file)
+        uFromFile = np.load(load_file)
+        vFromFile = np.load(load_file)
+    return time, uFromFile, vFromFile, bFromFile
+
 def makeChebPoints(N):
     kList = np.arange(1,N+1)
     points = np.cos(np.pi*((2*kList-1)/(2*N)))

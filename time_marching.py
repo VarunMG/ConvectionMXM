@@ -12,13 +12,11 @@ def calcNu(b_var):
     return -1*dzdTAvgVals[0][0]
 
 def writeNu(fileName,tVals,NuVals):
-    try:
-        with open(fileName,'wb') as NuData:
-            np.save(NuData,tVals)
-            np.save(NuData,NuVals)
-        return 1
-    except:
-        return 0
+    with open(fileName,'wb') as NuData:
+        np.save(NuData,tVals)
+        np.save(NuData,NuVals)
+    return 1
+
     
 def writeFields(fileName,time,b_var,u_var,v_var):
     b_var.change_scales(1)
@@ -152,15 +150,16 @@ try:
         timestep = CFL.compute_timestep()
         solver.step(timestep)
         flow_Nu = flow.volume_integral('Nu')/volume
-        #tVals.append(solver.sim_time)
-        #NuVals.append(flow_Nu)
-        #writeNu(NuFileName,tVals,NuVals)
+        tVals.append(solver.sim_time)
+        NuVals.append(flow_Nu)
+        
         if (solver.iteration-1) % 10 == 0:
             logger.info('Iteration=%i, Time=%e, dt=%e, Nu=%f' %(solver.iteration, solver.sim_time, timestep, flow_Nu))
         #writing things to files
-        #if (solver.iteration-1) %10 == 0:
-            #fileName = fluidDataFileName + str(round(100000*solver.sim_time)/100000) + '.npy'
-            #write = writeFields(fileName,solver.sim_time,b,u,v)
+        if (solver.iteration-1) %10 == 0:
+            writeNu(NuFileName,tVals,NuVals)
+            fileName = fluidDataFileName + str(round(100000*solver.sim_time)/100000) + '.npy'
+            write = writeFields(fileName,solver.sim_time,b,u,v)
 except:
     logger.error('Exception raised, triggering end of main loop.')
     raise

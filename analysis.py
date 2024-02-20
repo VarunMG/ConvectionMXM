@@ -102,15 +102,16 @@ def plotFields(xArr,zArr, uArr,vArr,bArr):
     fig.colorbar(p4,ax=axs[1,1])
     
 
-uArr, vArr, bArr, phiArr, dt = openFields('filename')
+#put the actual file you scp from the server instead of "filename". This should include the folder name and the fluidData name. 
+time, uArr, vArr, bArr = openFields_timemarcher('filename')
 
-#put in the inputs used for simulation
+#put in the inputs used for simulation. This can be found in the title of the folder. 
 Nx = 84
 Nz = 120
 alpha =  1.5585
 xArr, zArr = makeCoordArrs(alpha,Nx,Nz)
 
-plotFields(xArr,zArr,uArr,vArr,bArr)
+plotFields(xArr,zArr,uArr.T,vArr.T,bArr.T)
 
 shells, e_spectra, b_spectra = calcSpectra(uArr,vArr,zArr,alpha,Nx)
 

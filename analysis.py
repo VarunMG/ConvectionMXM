@@ -100,7 +100,14 @@ def plotFields(xArr,zArr, uArr,vArr,bArr):
     speeds = np.sqrt(uArr**2+vArr**2)
     p4 = axs[1,1].pcolormesh(X.T,Z.T,speeds,cmap='RdBu')
     fig.colorbar(p4,ax=axs[1,1])
-    
+
+def plotLongBox(xArr,zArr,array):
+    X,Z = np.meshgrid(xArr,zArr)
+    plt.figure()
+    axs = plt.gca()
+    plt.pcolormesh(X,Z,array,cmap='seismic')
+    plt.colorbar(orientation='horizontal')
+    axs.set_aspect('equal')
 
 #put the actual file you scp from the server instead of "filename". This should include the folder name and the fluidData name. 
 time, uArr, vArr, bArr = openFields_timemarcher('filename')
@@ -111,7 +118,11 @@ Nz = 120
 alpha =  1.5585
 xArr, zArr = makeCoordArrs(alpha,Nx,Nz)
 
+#this makes 4 figures that plot the fields
 plotFields(xArr,zArr,uArr.T,vArr.T,bArr.T)
+
+#this is great for plotting results from a long box simulations
+plotLongBox(xArr,zArr,bArr)
 
 shells, e_spectra, b_spectra = calcSpectra(uArr,vArr,zArr,alpha,Nx)
 

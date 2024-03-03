@@ -36,7 +36,7 @@ Rayleigh = 10000
 Prandtl = 7
 dealias = 3/2
 stop_sim_time = 10
-timestepper = d3.RK222
+timestepper = d3.RK443
 max_timestep = 0.125
 dtype = np.float64
 

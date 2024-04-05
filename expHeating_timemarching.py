@@ -213,7 +213,7 @@ try:
             fileName = fluidDataFileName + str(round(100000*solver.sim_time)/100000) + '.npy'
             write = writeFields(fileName,solver.sim_time,b,u,v)
             if write == 0:
-                #print('fields are not writing')
+                print('fields are not writing')
         #if (solver.iteration-1) % 1000 == 0:
             #writeNu(NuFileName,tVals,NuVals)
             #writeAllVertMeans(vertMeanFileName,allVertMeans)

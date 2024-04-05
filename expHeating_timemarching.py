@@ -52,12 +52,12 @@ def writeFields(fileName,time,b_var,u_var,v_var):
 #Lz = 2
 alpha = np.pi/10
 Nx, Nz = 1000,300
-Rayleigh = 1340
+Rayleigh = 4000
 Prandtl = 7
 dealias = 3/2
-stop_sim_time = 10000
+stop_sim_time = 100
 timestepper = d3.RK443
-max_timestep = 0.5
+max_timestep = 0.01
 dtype = np.float64
 
 # Bases
@@ -208,11 +208,11 @@ try:
             #max_Re = flow.max('Re')
             #logger.info('Iteration=%i, Time=%e, dt=%e, max Re=%f' %(solver.iteration, solver.sim_time, timestep, max_Re))
             logger.info('Iteration=%i, Time=%e, dt=%e, Nu=%f, <T>=%f' %(solver.iteration, solver.sim_time, timestep, flow_Nu, flow_TAvg))
-        #if (solver.iteration-1) % 100 == 0:
-            #writeNu(NuFileName,tVals,NuVals)
-            #fileName = fluidDataFileName + str(round(100000*solver.sim_time)/100000) + '.npy'
-            #write = writeFields(fileName,solver.sim_time,b,u,v)
-            #if write == 0:
+        if (solver.iteration-1) % 100 == 0:
+            writeNu(NuFileName,tVals,NuVals)
+            fileName = fluidDataFileName + str(round(100000*solver.sim_time)/100000) + '.npy'
+            write = writeFields(fileName,solver.sim_time,b,u,v)
+            if write == 0:
                 #print('fields are not writing')
         #if (solver.iteration-1) % 1000 == 0:
             #writeNu(NuFileName,tVals,NuVals)
